@@ -15,9 +15,12 @@ import org.semanticweb.owlapi.model.{
 object interpret {
   private val cache = new HashMap[String, String] {
     override def default(source: String): String = {
-      val response = interpret.transform(source).compactPrint
-      this(source) = response
-      response
+      // OWL API isn't thread-safe
+      synchronized {
+        val response = interpret.transform(source).compactPrint
+        this(source) = response
+        response
+      }
     }
   }
 
