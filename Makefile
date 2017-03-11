@@ -1,55 +1,29 @@
-PORT       ?= 53115
-SCALA      ?= scala
-FSC        ?= fsc
-JAR        ?= jar
-WGET       ?= wget -O -
-HERMIT_URL ?= https://www.cs.ox.ac.uk/isg/tools/HermiT/download/current/HermiT.zip
-SPRAY_URL  ?= http://central.maven.org/maven2/io/spray/spray-json_2.11/1.3.3/spray-json_2.11-1.3.3.jar
-
-SOURCES = KnowBase interpret Server
-JARDEPS = vendor/HermiT.jar vendor/spray-json_2.11-1.3.3.jar
-
-EMPTY  :=
-SPACE  := $(EMPTY) $(EMPTY)
-JARPATH = $(subst $(SPACE),:,$(JARDEPS))
-
-SCALA_FILES = $(patsubst %,src/semserv/%.scala,$(SOURCES))
-CLASS_FILES = $(patsubst src/%.scala,build/%.class,$(SCALA_FILES))
+PORT ?= 53115
+SBT  ?= sbt
+JAVA ?= java
 
 
-all: semserv.jar
-	-$(SCALA) -classpath $<:$(JARPATH) -e 'semserv.Server($(PORT))'
+run: semserv.jar
+	@echo
+	@echo -e "\e[32mStarting Semserv\e[0m"
+	@echo -e "\e[32m================\e[0m"
+	@echo
+	@echo -e "\e[33mDisregard JarClassLoader warnings, they\e[0m"
+	@echo -e "\e[33mare expected and just can't be silenced.\e[0m"
+	@echo
+	@$(JAVA) -Done-jar.verbose=false -jar $< || echo
 
 
 semserv.jar: $(CLASS_FILES)
-	cd build && $(JAR) cf ../$@ .
-
-
-build/%.class: src/%.scala | build $(JARDEPS)
-	$(FSC) -d build -classpath build:$(JARPATH) $<
-
-build:
-	mkdir $@
-
-
-vendor/HermiT.jar: | vendor
-	$(WGET) '$(HERMIT_URL)' > vendor/HermiT.zip
-	cd vendor && unzip HermiT.zip HermiT.jar
-	rm vendor/HermiT.zip
-
-vendor/spray-json_2.11-1.3.3.jar: | vendor
-	$(WGET) '$(SPRAY_URL)' > $@
-
-vendor:
-	mkdir $@
+	$(SBT) one-jar
+	cp target/scala-2.11/semserv_2.11-0.1.0-one-jar.jar $@
 
 
 clean:
-	rm -rf build
-	$(FSC) -shutdown
+	$(SBT) clean
 
 realclean: clean
 	rm -f semserv.jar
 
 
-.PHONY: all clean realclean
+.PHONY: run clean realclean

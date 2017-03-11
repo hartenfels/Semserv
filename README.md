@@ -12,17 +12,17 @@ TBD
 
 You'll need the following:
 
-* Scala
+* Scala and SBT
 
 * Java JDK 8, shouldn't matter if it's Oracle or OpenJDK
 
-* A Unix-like environment (make, sh)
+On a Unix-like system, just run `make` and everything will be compiled for you.
+The server will be ran automatically.
 
-Then should be able to just run `make` and it'll download the dependencies,
-compile the Scala code and run the server for you.
-
-If you want to use curl instead of wget to download the dependencies, use `make
--e WGET=curl` instead.
+Otherwise, you need to execute `sbt run` manually. To bundle everything into a
+single JAR file, run `sbt one-jar` and run
+`target/scala-2.11/semserv_2.11-0.1.0-one-jar.jar` as if it were a regular Java
+program.
 
 
 # LICENSE

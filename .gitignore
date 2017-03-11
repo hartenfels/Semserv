@@ -1,3 +1,2 @@
-build
 semserv.jar
-vendor
+target/
