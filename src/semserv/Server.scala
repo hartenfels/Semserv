@@ -15,7 +15,7 @@ class Server(port: Int) {
   private val server = new ServerSocket(port)
 
   def listen(): Unit = {
-    println("# listen " + port)
+    println("# listen " + server.getLocalPort)
     while (true) {
       val socket = server.accept()
       println("# connect " + socket.getInetAddress)
