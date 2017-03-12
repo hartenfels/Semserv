@@ -1,0 +1,227 @@
+{
+  "anyOf" : [
+    {
+      "type"     : "array",
+      "minItems" : 3,
+      "maxItems" : 3,
+      "items"    : [
+        {"$ref" : "#/_defs/source"},
+        {"enum" : ["nominal"]},
+        {"$ref" : "#/_defs/nominal"}
+      ]
+    },
+    {
+      "type"     : "array",
+      "minItems" : 3,
+      "maxItems" : 3,
+      "items"    : [
+        {"$ref" : "#/_defs/source"},
+        {"enum" : ["satisfiable"]},
+        {"$ref" : "#/_defs/concept"}
+      ]
+    },
+    {
+      "type"     : "array",
+      "minItems" : 3,
+      "maxItems" : 3,
+      "items"    : [
+        {"$ref" : "#/_defs/source"},
+        {"enum" : ["comparable"]},
+        {"$ref" : "#/_defs/concepts"}
+      ]
+    },
+    {
+      "type"     : "array",
+      "minItems" : 3,
+      "maxItems" : 3,
+      "items"    : [
+        {"$ref" : "#/_defs/source"},
+        {"enum" : ["same"]},
+        {"$ref" : "#/_defs/nominalsPair"}
+      ]
+    },
+    {
+      "type"     : "array",
+      "minItems" : 3,
+      "maxItems" : 3,
+      "items"    : [
+        {"$ref" : "#/_defs/source"},
+        {"enum" : ["query"]},
+        {"$ref" : "#/_defs/concept"}
+      ]
+    },
+    {
+      "type"     : "array",
+      "minItems" : 3,
+      "maxItems" : 3,
+      "items"    : [
+        {"$ref" : "#/_defs/source"},
+        {"enum" : ["project"]},
+        {"$ref" : "#/_defs/nominalRolePair"}
+      ]
+    },
+    {
+      "type"     : "array",
+      "minItems" : 3,
+      "maxItems" : 3,
+      "items"    : [
+        {"$ref" : "#/_defs/source"},
+        {"enum" : ["subtype"]},
+        {"$ref" : "#/_defs/conceptsPair"}
+      ]
+    },
+    {
+      "type"     : "array",
+      "minItems" : 3,
+      "maxItems" : 3,
+      "items"    : [
+        {"$ref" : "#/_defs/source"},
+        {"enum" : ["member"]},
+        {"$ref" : "#/_defs/conceptNominalPair"}
+      ]
+    }
+  ],
+
+  "_defs" : {
+    "source"  : {"title" : "source",  "type" : "string"},
+    "nominal" : {"title" : "nominal", "type" : "string"},
+
+    "concepts" : {
+      "title" : "concepts",
+      "type"  : "array",
+      "items" : {"$ref" : "#/_defs/concept"}
+    },
+
+    "concept" : {
+      "anyOf" : [
+        {"title" : "everything", "enum" : [true ]},
+        {"title" : "nothing",    "enum" : [false]},
+        {
+          "title"    : "concept",
+          "type"     : "array",
+          "minItems" : 2,
+          "maxItems" : 2,
+          "items"    : [
+            {"enum" : ["C"]},
+            {"type" : "string"}
+          ]
+        },
+        {
+          "title"    : "unify",
+          "type"     : "array",
+          "minItems" : 2,
+          "maxItems" : 2,
+          "items"    : [
+            {"enum" : ["U"]},
+            {"$ref" : "#/_defs/concepts"}
+          ]
+        },
+        {
+          "title"    : "intersect",
+          "type"     : "array",
+          "minItems" : 2,
+          "maxItems" : 2,
+          "items"    : [
+            {"enum" : ["I"]},
+            {"$ref" : "#/_defs/concepts"}
+          ]
+        },
+        {
+          "title"    : "negate",
+          "type"     : "array",
+          "minItems" : 2,
+          "maxItems" : 2,
+          "items"    : [
+            {"enum" : ["N"]},
+            {"$ref" : "#/_defs/concept"}
+          ]
+        },
+        {
+          "title"    : "exists",
+          "type"     : "array",
+          "minItems" : 3,
+          "maxItems" : 3,
+          "items"    : [
+            {"enum" : ["E"]},
+            {"$ref" : "#/_defs/role"},
+            {"$ref" : "#/_defs/concept"}
+          ]
+        },
+        {
+          "title"    : "forall",
+          "type"     : "array",
+          "minItems" : 3,
+          "maxItems" : 3,
+          "items"    : [
+            {"enum" : ["A"]},
+            {"$ref" : "#/_defs/role"},
+            {"$ref" : "#/_defs/concept"}
+          ]
+        }
+      ]
+    },
+
+    "role" : {
+      "anyOf" : [
+        {
+          "title"    : "role",
+          "type"     : "array",
+          "minItems" : 2,
+          "maxItems" : 2,
+          "items"    : [
+            {"enum" : ["r"]},
+            {"type" : "string"}
+          ]
+        },
+        {
+          "title"    : "invert",
+          "type"     : "array",
+          "minItems" : 2,
+          "maxItems" : 2,
+          "items"    : [
+            {"enum" : ["i"]},
+            {"$ref" : "#/_defs/role"}
+          ]
+        }
+      ]
+    },
+
+    "nominalsPair" : {
+      "title"    : "nominalsPair",
+      "type"     : "array",
+      "minItems" : 2,
+      "maxItems" : 2,
+      "items"    : {"$ref" : "#/_defs/nominal"}
+    },
+
+    "conceptsPair" : {
+      "title"    : "conceptsPair",
+      "type"     : "array",
+      "minItems" : 2,
+      "maxItems" : 2,
+      "items"    : {"$ref" : "#/_defs/concept"}
+    },
+
+    "nominalRolePair" : {
+      "title"    : "nominalRolePair",
+      "type"     : "array",
+      "minItems" : 2,
+      "maxItems" : 2,
+      "items"    : [
+        {"$ref" : "#/_defs/nominal"},
+        {"$ref" : "#/_defs/role"}
+      ]
+    },
+
+    "conceptNominalPair" : {
+      "title"    : "conceptNominalPair",
+      "type"     : "array",
+      "minItems" : 2,
+      "maxItems" : 2,
+      "items"    : [
+        {"$ref" : "#/_defs/concept"},
+        {"$ref" : "#/_defs/nominal"}
+      ]
+    }
+  }
+}

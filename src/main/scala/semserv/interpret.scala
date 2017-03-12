@@ -2,13 +2,15 @@ package semserv;
 
 import scala.collection.mutable.HashMap
 
-import spray.json.{
-  deserializationError, JsonParser, JsValue,
+import play.api.libs.json.{
+  Json, JsValue, JsSuccess, JsError,
   JsArray   => JA,
   JsBoolean => JB,
   JsObject  => JO,
   JsString  => JS
 }
+
+import com.eclipsesource.schema._
 
 import org.semanticweb.owlapi.model.{
   OWLNamedIndividual          => Nominal,
@@ -18,11 +20,17 @@ import org.semanticweb.owlapi.model.{
 
 
 object interpret {
+  private val validator = new SchemaValidator()
+  private val schema    = {
+    val resource = getClass.getResourceAsStream("/semserv.schema.json")
+    Json.fromJson[SchemaType](Json.parse(resource)).get
+  }
+
   private val cache = new HashMap[String, String] {
     override def default(source: String): String = {
       // OWL API isn't thread-safe
       synchronized {
-        val response = interpret.transform(source).compactPrint
+        val response = Json.stringify(interpret.transform(source))
         this(source) = response
         response
       }
@@ -35,16 +43,20 @@ object interpret {
 
   private def transform(source: String): JsValue =
     try {
-      execute(JsonParser(source))
+      val value = Json.parse(source)
+      validator.validate(schema, value) match {
+        case JsSuccess(_, _) => execute(value)
+        case JsError(e)      => JO(Map("error" -> e.toJson))
+      }
     } catch {
-      case e: Exception => JO(Map("error" -> JS(e.toString())))
+      case e: Exception => JO(Map("error" -> JS(e.toString)))
     }
 
   private def execute(value: JsValue): JsValue =
     value match {
-      case JA(Vector(JS(kb), JS(op), args)) =>
+      case JA(Seq(JS(kb), JS(op), args)) =>
         new Interpreter(KnowBase(kb)).onOp(op, args)
-      case _ => deserializationError("bad root")
+      case _ => throw new Exception("bad root")
     }
 
 
@@ -59,28 +71,31 @@ object interpret {
         case "project"     => onProject(args)
         case "subtype"     => onSubtype(args)
         case "member"      => onMember(args)
-        case _             => deserializationError("bad op")
+        case _             => throw new Exception("bad op")
       }
 
     def ja(arr: Array[Nominal]): JsValue =
-      JA(arr.map(n => JS(kb.id(n))).to[Vector])
+      JA(arr.map(n => JS(kb.id(n))).to[Seq])
 
     def onNominal(value: JsValue): Nominal =
       value match {
         case JS(s) => kb.nominal(s)
-        case _     => deserializationError("bad nominal")
+        case _     => throw new Exception("bad nominal")
       }
 
     def onSatisfiable(value: JsValue): JsValue =
       JB(kb.satisfiable(onConcept(value)))
 
     def onComparable(value: JsValue): JsValue =
-      JB(kb.comparable(onConcept(value)))
+      value match {
+        case JA(a) => JB(kb.comparable(a.map(onConcept(_)):_*))
+        case _     => throw new Exception("bad comparable")
+      }
 
     def onSame(value: JsValue): JsValue =
       value match {
-        case JA(Vector(n, m)) => JB(kb.same(onNominal(n), onNominal(m)))
-        case _                => deserializationError("bad same")
+        case JA(Seq(n, m)) => JB(kb.same(onNominal(n), onNominal(m)))
+        case _             => throw new Exception("bad same")
       }
 
     def onQuery(value: JsValue): JsValue =
@@ -88,40 +103,40 @@ object interpret {
 
     def onProject(value: JsValue): JsValue =
       value match {
-        case JA(Vector(n, r)) => ja(kb.project(onNominal(n), onRole(r)))
-        case _                => deserializationError("bad project")
+        case JA(Seq(n, r)) => ja(kb.project(onNominal(n), onRole(r)))
+        case _             => throw new Exception("bad project")
       }
 
     def onSubtype(value: JsValue): JsValue =
       value match {
-        case JA(Vector(c, d)) => JB(kb.subtype(onConcept(c), onConcept(d)))
-        case _                => deserializationError("bad subtype")
+        case JA(Seq(c, d)) => JB(kb.subtype(onConcept(c), onConcept(d)))
+        case _             => throw new Exception("bad subtype")
       }
 
     def onMember(value: JsValue): JsValue =
       value match {
-        case JA(Vector(c, n)) => JB(kb.member(onConcept(c), onNominal(n)))
-        case _                => deserializationError("bad subtype")
+        case JA(Seq(c, n)) => JB(kb.member(onConcept(c), onNominal(n)))
+        case _             => throw new Exception("bad subtype")
       }
 
     def onRole(value: JsValue): Role =
       value match {
-        case JA(Vector(JS("r"), JS(s))) => kb.role(s)
-        case JA(Vector(JS("i"), v))     => kb.invert(onRole(v))
-        case _                          => deserializationError("bad role")
+        case JA(Seq(JS("r"), JS(s))) => kb.role(s)
+        case JA(Seq(JS("i"), v))     => kb.invert(onRole(v))
+        case _                       => throw new Exception("bad role")
       }
 
     def onConcept(value: JsValue): Concept =
       value match {
-        case JB(true)                   => kb.everything
-        case JB(false)                  => kb.nothing
-        case JA(Vector(JS("C"), JS(s))) => kb.concept(s)
-        case JA(Vector(JS("U"), JA(a))) => kb.unify(    a.map(onConcept(_)):_*)
-        case JA(Vector(JS("I"), JA(a))) => kb.intersect(a.map(onConcept(_)):_*)
-        case JA(Vector(JS("N"), c))     => kb.negate(onConcept(c))
-        case JA(Vector(JS("E"), r, c))  => kb.exists(onRole(r), onConcept(c))
-        case JA(Vector(JS("A"), r, c))  => kb.forall(onRole(r), onConcept(c))
-        case _                          => deserializationError("bad concept")
+        case JB(true)                => kb.everything
+        case JB(false)               => kb.nothing
+        case JA(Seq(JS("C"), JS(s))) => kb.concept(s)
+        case JA(Seq(JS("U"), JA(a))) => kb.unify(    a.map(onConcept(_)):_*)
+        case JA(Seq(JS("I"), JA(a))) => kb.intersect(a.map(onConcept(_)):_*)
+        case JA(Seq(JS("N"), c))     => kb.negate(onConcept(c))
+        case JA(Seq(JS("E"), r, c))  => kb.exists(onRole(r), onConcept(c))
+        case JA(Seq(JS("A"), r, c))  => kb.forall(onRole(r), onConcept(c))
+        case _                       => throw new Exception("bad concept")
       }
   }
 }
