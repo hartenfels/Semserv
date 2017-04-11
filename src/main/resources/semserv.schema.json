@@ -107,6 +107,16 @@
           ]
         },
         {
+          "title"    : "object",
+          "type"     : "array",
+          "minItems" : 2,
+          "maxItems" : 2,
+          "items"    : [
+            {"enum" : ["O"]},
+            {"type" : "string"}
+          ]
+        },
+        {
           "title"    : "unify",
           "type"     : "array",
           "minItems" : 2,

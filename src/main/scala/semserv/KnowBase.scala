@@ -55,6 +55,8 @@ class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
   def everything: Concept = df.getOWLThing
   def nothing:    Concept = df.getOWLNothing
 
+  def one(s: String): Concept = df.getOWLObjectOneOf(nominal(s))
+
   def unify    (cs: Concept*): Concept = df.getOWLObjectUnionOf(cs:_*)
   def intersect(cs: Concept*): Concept = df.getOWLObjectIntersectionOf(cs:_*)
   def negate   (c:  Concept ): Concept = df.getOWLObjectComplementOf(c)

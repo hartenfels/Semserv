@@ -131,6 +131,7 @@ object interpret {
         case JB(true)                => kb.everything
         case JB(false)               => kb.nothing
         case JA(Seq(JS("C"), JS(s))) => kb.concept(s)
+        case JA(Seq(JS("O"), JS(s))) => kb.one(s)
         case JA(Seq(JS("U"), JA(a))) => kb.unify(    a.map(onConcept(_)):_*)
         case JA(Seq(JS("I"), JA(a))) => kb.intersect(a.map(onConcept(_)):_*)
         case JA(Seq(JS("N"), c))     => kb.negate(onConcept(c))
