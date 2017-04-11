@@ -6,8 +6,8 @@
       "maxItems" : 3,
       "items"    : [
         {"$ref" : "#/_defs/source"},
-        {"enum" : ["nominal"]},
-        {"$ref" : "#/_defs/nominal"}
+        {"enum" : ["individual"]},
+        {"$ref" : "#/_defs/individual"}
       ]
     },
     {
@@ -37,7 +37,7 @@
       "items"    : [
         {"$ref" : "#/_defs/source"},
         {"enum" : ["same"]},
-        {"$ref" : "#/_defs/nominalsPair"}
+        {"$ref" : "#/_defs/individualsPair"}
       ]
     },
     {
@@ -57,7 +57,7 @@
       "items"    : [
         {"$ref" : "#/_defs/source"},
         {"enum" : ["project"]},
-        {"$ref" : "#/_defs/nominalRolePair"}
+        {"$ref" : "#/_defs/individualRolePair"}
       ]
     },
     {
@@ -77,14 +77,14 @@
       "items"    : [
         {"$ref" : "#/_defs/source"},
         {"enum" : ["member"]},
-        {"$ref" : "#/_defs/conceptNominalPair"}
+        {"$ref" : "#/_defs/conceptIndividualPair"}
       ]
     }
   ],
 
   "_defs" : {
-    "source"  : {"title" : "source",  "type" : "string"},
-    "nominal" : {"title" : "nominal", "type" : "string"},
+    "source"     : {"title" : "source",     "type" : "string"},
+    "individual" : {"title" : "individual", "type" : "string"},
 
     "concepts" : {
       "title" : "concepts",
@@ -196,12 +196,12 @@
       ]
     },
 
-    "nominalsPair" : {
-      "title"    : "nominalsPair",
+    "individualsPair" : {
+      "title"    : "individualsPair",
       "type"     : "array",
       "minItems" : 2,
       "maxItems" : 2,
-      "items"    : {"$ref" : "#/_defs/nominal"}
+      "items"    : {"$ref" : "#/_defs/individual"}
     },
 
     "conceptsPair" : {
@@ -212,25 +212,25 @@
       "items"    : {"$ref" : "#/_defs/concept"}
     },
 
-    "nominalRolePair" : {
-      "title"    : "nominalRolePair",
+    "individualRolePair" : {
+      "title"    : "individualRolePair",
       "type"     : "array",
       "minItems" : 2,
       "maxItems" : 2,
       "items"    : [
-        {"$ref" : "#/_defs/nominal"},
+        {"$ref" : "#/_defs/individual"},
         {"$ref" : "#/_defs/role"}
       ]
     },
 
-    "conceptNominalPair" : {
-      "title"    : "conceptNominalPair",
+    "conceptIndividualPair" : {
+      "title"    : "conceptIndividualPair",
       "type"     : "array",
       "minItems" : 2,
       "maxItems" : 2,
       "items"    : [
         {"$ref" : "#/_defs/concept"},
-        {"$ref" : "#/_defs/nominal"}
+        {"$ref" : "#/_defs/individual"}
       ]
     }
   }

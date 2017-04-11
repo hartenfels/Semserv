@@ -9,7 +9,7 @@ import scala.util.Try
 
 import org.semanticweb.owlapi.model.{
   IRI, OWLAxiom, OWLDataFactory, OWLOntology,
-  OWLNamedIndividual          => Nominal,
+  OWLNamedIndividual          => Individual,
   OWLObjectPropertyExpression => Role,
   OWLClassExpression          => Concept
 }
@@ -43,11 +43,11 @@ class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
   private def toIRI (s: String): IRI =
     IRI.create(Try(pre.expandAbbreviatedIRI(s)) getOrElse s)
 
-  def nominal(s: String): Nominal = df.getOWLNamedIndividual(toIRI(s))
-  def role   (s: String): Role    = df.getOWLObjectProperty(toIRI(s))
-  def concept(s: String): Concept = df.getOWLClass(toIRI(s))
+  def individual(s: String): Individual = df.getOWLNamedIndividual(toIRI(s))
+  def role      (s: String): Role       = df.getOWLObjectProperty(toIRI(s))
+  def concept   (s: String): Concept    = df.getOWLClass(toIRI(s))
 
-  def id(n: Nominal): String = pre.abbreviateIRI(n.toStringID)
+  def id(i: Individual): String = pre.abbreviateIRI(i.toStringID)
 
 
   def invert(r: Role): Role = df.getOWLObjectInverseOf(r)
@@ -55,7 +55,7 @@ class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
   def everything: Concept = df.getOWLThing
   def nothing:    Concept = df.getOWLNothing
 
-  def one(s: String): Concept = df.getOWLObjectOneOf(nominal(s))
+  def one(s: String): Concept = df.getOWLObjectOneOf(individual(s))
 
   def unify    (cs: Concept*): Concept = df.getOWLObjectUnionOf(cs:_*)
   def intersect(cs: Concept*): Concept = df.getOWLObjectIntersectionOf(cs:_*)
@@ -69,17 +69,17 @@ class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
 
   def comparable(cs: Concept*): Boolean = satisfiable(intersect(cs:_*))
 
-  def same(n: Nominal, m:Nominal): Boolean = hermit.isSameIndividual(n, m)
+  def same(i: Individual, j:Individual): Boolean = hermit.isSameIndividual(i, j)
 
 
-  private def flat(set: NodeSet[Nominal]): Array[Nominal] =
-    set.getFlattened().toArray(new Array[Nominal](0))
+  private def flat(set: NodeSet[Individual]): Array[Individual] =
+    set.getFlattened().toArray(new Array[Individual](0))
 
-  def query(c: Concept): Array[Nominal] =
+  def query(c: Concept): Array[Individual] =
     flat(hermit.getInstances(c, false))
 
-  def project(n: Nominal, r: Role): Array[Nominal] =
-    flat(hermit.getObjectPropertyValues(n, r))
+  def project(i: Individual, r: Role): Array[Individual] =
+    flat(hermit.getObjectPropertyValues(i, r))
 
 
   private def entail(a: OWLAxiom, b: OWLAxiom): Boolean =
@@ -90,8 +90,8 @@ class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
       df.getOWLSubClassOfAxiom(c, d),
       df.getOWLSubClassOfAxiom(c, df.getOWLObjectComplementOf(d)))
 
-  def member(c: Concept, n: Nominal): Boolean =
+  def member(c: Concept, i: Individual): Boolean =
     entail(
-      df.getOWLClassAssertionAxiom(c, n),
-      df.getOWLClassAssertionAxiom(df.getOWLObjectComplementOf(c), n))
+      df.getOWLClassAssertionAxiom(c, i),
+      df.getOWLClassAssertionAxiom(df.getOWLObjectComplementOf(c), i))
 }

@@ -13,7 +13,7 @@ import play.api.libs.json.{
 import com.eclipsesource.schema._
 
 import org.semanticweb.owlapi.model.{
-  OWLNamedIndividual          => Nominal,
+  OWLNamedIndividual          => Individual,
   OWLObjectPropertyExpression => Role,
   OWLClassExpression          => Concept
 }
@@ -63,7 +63,7 @@ object interpret {
   private class Interpreter(private val kb: KnowBase) {
     def onOp(value: String, args: JsValue): JsValue =
       value match {
-        case "nominal"     => JS(kb.id(onNominal(args)))
+        case "individual"  => JS(kb.id(onIndividual(args)))
         case "satisfiable" => onSatisfiable(args)
         case "comparable"  => onComparable(args)
         case "same"        => onSame(args)
@@ -74,13 +74,13 @@ object interpret {
         case _             => throw new Exception("bad op")
       }
 
-    def ja(arr: Array[Nominal]): JsValue =
-      JA(arr.map(n => JS(kb.id(n))).to[Seq])
+    def ja(arr: Array[Individual]): JsValue =
+      JA(arr.map(i => JS(kb.id(i))).to[Seq])
 
-    def onNominal(value: JsValue): Nominal =
+    def onIndividual(value: JsValue): Individual =
       value match {
-        case JS(s) => kb.nominal(s)
-        case _     => throw new Exception("bad nominal")
+        case JS(s) => kb.individual(s)
+        case _     => throw new Exception("bad individual")
       }
 
     def onSatisfiable(value: JsValue): JsValue =
@@ -94,7 +94,7 @@ object interpret {
 
     def onSame(value: JsValue): JsValue =
       value match {
-        case JA(Seq(n, m)) => JB(kb.same(onNominal(n), onNominal(m)))
+        case JA(Seq(i, j)) => JB(kb.same(onIndividual(i), onIndividual(j)))
         case _             => throw new Exception("bad same")
       }
 
@@ -103,7 +103,7 @@ object interpret {
 
     def onProject(value: JsValue): JsValue =
       value match {
-        case JA(Seq(n, r)) => ja(kb.project(onNominal(n), onRole(r)))
+        case JA(Seq(i, r)) => ja(kb.project(onIndividual(i), onRole(r)))
         case _             => throw new Exception("bad project")
       }
 
@@ -115,7 +115,7 @@ object interpret {
 
     def onMember(value: JsValue): JsValue =
       value match {
-        case JA(Seq(c, n)) => JB(kb.member(onConcept(c), onNominal(n)))
+        case JA(Seq(c, i)) => JB(kb.member(onConcept(c), onIndividual(i)))
         case _             => throw new Exception("bad subtype")
       }
 
