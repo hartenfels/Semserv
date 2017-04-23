@@ -12,17 +12,18 @@ TBD
 
 You'll need the following:
 
-* Scala and SBT
+* Scala
+
+* Gradle
 
 * Java JDK 8, shouldn't matter if it's Oracle or OpenJDK
 
 On a Unix-like system, just run `make` and everything will be compiled for you.
 The server will be ran automatically.
 
-Otherwise, you need to execute `sbt run` manually. To bundle everything into a
-single JAR file, run `sbt one-jar` and run
-`target/scala-2.11/semserv_2.11-0.1.0-one-jar.jar` as if it were a regular Java
-program.
+Otherwise, you need to execute `gradle run` manually. To bundle everything into
+a single JAR file, run `gradle jar` and run `java -jar semserv.jar` as if it
+were a regular Java program.
 
 
 # LICENSE
