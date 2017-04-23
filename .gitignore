@@ -1,2 +1,8 @@
-semserv.jar
-target/
+build
+*.jar
+
+.gradle
+.gradletasknamecache
+gradle
+gradlew
+gradlew.bat

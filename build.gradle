@@ -1,0 +1,28 @@
+apply plugin: 'scala'
+apply plugin: 'application'
+
+
+repositories {
+  mavenCentral()
+  maven {
+    url 'http://dl.bintray.com/emueller/maven'
+  }
+}
+
+dependencies {
+  compile 'com.hermit-reasoner:org.semanticweb.hermit:1.3.8.4'
+  compile 'com.eclipsesource:play-json-schema-validator_2.11:0.8.8'
+}
+
+
+mainClassName = 'Main'
+
+jar {
+  destinationDir = projectDir
+  from {
+    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+  manifest {
+    attributes 'Main-Class': mainClassName
+  }
+}
