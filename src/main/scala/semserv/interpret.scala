@@ -71,6 +71,7 @@ object interpret {
         case "project"     => onProject(args)
         case "subtype"     => onSubtype(args)
         case "member"      => onMember(args)
+        case "signature"   => onSignature(args)
         case _             => throw new Exception("bad op")
       }
 
@@ -138,6 +139,14 @@ object interpret {
         case JA(Seq(JS("E"), r, c))  => kb.exists(onRole(r), onConcept(c))
         case JA(Seq(JS("A"), r, c))  => kb.forall(onRole(r), onConcept(c))
         case _                       => throw new Exception("bad concept")
+      }
+
+    def onSignature(value: JsValue): JsValue =
+      value match {
+        case JA(Seq(JS("concept"),    JS(iri))) => JB(kb.hasConceptInSignature(iri))
+        case JA(Seq(JS("role"),       JS(iri))) => JB(kb.hasRoleInSignature(iri))
+        case JA(Seq(JS("individual"), JS(iri))) => JB(kb.hasIndividualInSignature(iri))
+        case _                                  => throw new Exception("bad signature")
       }
   }
 }

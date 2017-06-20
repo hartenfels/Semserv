@@ -50,6 +50,16 @@ class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
   def id(i: Individual): String = pre.abbreviateIRI(i.toStringID)
 
 
+  def hasConceptInSignature(s: String): Boolean =
+    onto.containsClassInSignature(toIRI(s))
+
+  def hasRoleInSignature(s: String): Boolean =
+    onto.containsObjectPropertyInSignature(toIRI(s))
+
+  def hasIndividualInSignature(s: String): Boolean =
+    onto.containsIndividualInSignature(toIRI(s))
+
+
   def invert(r: Role): Role = df.getOWLObjectInverseOf(r)
 
   def everything: Concept = df.getOWLThing

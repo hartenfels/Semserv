@@ -79,12 +79,31 @@
         {"enum" : ["member"]},
         {"$ref" : "#/_defs/conceptIndividualPair"}
       ]
+    },
+    {
+      "type"     : "array",
+      "minItems" : 3,
+      "maxItems" : 3,
+      "items"    : [
+        {"$ref" : "#/_defs/source"},
+        {"enum" : ["signature"]},
+        {
+          "type"     : "array",
+          "minItems" : 2,
+          "maxItems" : 2,
+          "items"    : [
+            {"enum" : ["concept", "role", "individual"]},
+            {"$ref" : "#/_defs/iri"}
+          ]
+        }
+      ]
     }
   ],
 
   "_defs" : {
     "source"     : {"title" : "source",     "type" : "string"},
     "individual" : {"title" : "individual", "type" : "string"},
+    "iri"        : {"title" : "iri",        "type" : "string"},
 
     "concepts" : {
       "title" : "concepts",
