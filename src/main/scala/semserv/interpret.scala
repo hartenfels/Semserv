@@ -1,7 +1,5 @@
 package semserv
 
-import scala.collection.mutable.HashMap
-
 import play.api.libs.json.{
   Json, JsValue, JsSuccess, JsError,
   JsArray   => JA,
@@ -26,19 +24,15 @@ object interpret {
     Json.fromJson[SchemaType](Json.parse(resource)).get
   }
 
-  private val cache = new HashMap[String, String] {
-    override def default(source: String): String = {
-      // OWL API isn't thread-safe
-      synchronized {
-        val response = Json.stringify(interpret.transform(source))
-        this(source) = response
-        response
-      }
-    }
-  }
+
+  private val cache = RequestCache()
+
+  private def respond(req: String): String =
+    cache.get(req).getOrElse(
+      cache.set(req, Json.stringify(interpret.transform(req))))
 
   def apply(line: String): String =
-    if (line.trim.isEmpty()) "" else cache(line) + "\n"
+    if (line.trim.isEmpty()) "" else respond(line) + "\n"
 
 
   private def transform(source: String): JsValue =
@@ -54,8 +48,10 @@ object interpret {
 
   private def execute(value: JsValue): JsValue =
     value match {
-      case JA(Seq(JS(kb), JS(op), args)) =>
+      case JA(Seq(JS(kb), JS(op), args)) => synchronized {
+        // OWL API isn't thread-safe
         new Interpreter(KnowBase(kb)).onOp(op, args)
+      }
       case _ => throw new Exception("bad root")
     }
 

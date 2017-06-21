@@ -13,6 +13,11 @@ object Main {
            |Set the SEMSERV_PORT environment variable
            |if you want to use a different port than
            |the default port $DefaultPort.
+           |
+           |Set the SEMSERV_CACHE environment variable
+           |to set the cache database file. This may be
+           |a relative or absolute path, or ":memory:"
+           |for an in-memory database.
            |""".stripMargin)
       System.exit(2)
     }
