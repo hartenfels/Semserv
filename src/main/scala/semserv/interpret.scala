@@ -1,4 +1,4 @@
-package semserv;
+package semserv
 
 import scala.collection.mutable.HashMap
 

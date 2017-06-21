@@ -3,7 +3,7 @@ package semserv
 import java.io.File
 import org.semanticweb.HermiT.Reasoner
 import org.semanticweb.owlapi.apibinding.OWLManager
-import org.semanticweb.owlapi.reasoner.NodeSet;
+import org.semanticweb.owlapi.reasoner.NodeSet
 import scala.collection.mutable.HashMap
 import scala.util.Try
 
