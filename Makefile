@@ -11,6 +11,7 @@ run: semserv.jar
 
 semserv.jar: $(SOURCE_FILES) $(BUILD_FILES)
 	$(GRADLE) jar
+	touch $@
 
 
 clean:
