@@ -47,7 +47,7 @@ class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
   def role      (s: String): Role       = df.getOWLObjectProperty(toIRI(s))
   def concept   (s: String): Concept    = df.getOWLClass(toIRI(s))
 
-  def id(i: Individual): String = pre.abbreviateIRI(i.toStringID)
+  def id(i: Individual): String = i.toStringID
 
 
   def hasConceptInSignature(s: String): Boolean =
