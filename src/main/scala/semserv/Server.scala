@@ -1,7 +1,8 @@
 package semserv
 
-import java.io.{BufferedReader, InputStreamReader, PrintWriter}
+import java.io.{BufferedReader, BufferedWriter, InputStreamReader, OutputStreamWriter}
 import java.net.{Socket, ServerSocket}
+import java.nio.charset.StandardCharsets.UTF_8;
 
 
 object Server {
@@ -26,9 +27,11 @@ class Server(port: Int) {
 
 
 class ServerThread(private val socket: Socket) extends Thread {
-  private val output = new PrintWriter(socket.getOutputStream)
-  private val input  =
-      new BufferedReader(new InputStreamReader(socket.getInputStream))
+  private val output = new BufferedWriter(
+      new OutputStreamWriter(socket.getOutputStream, UTF_8))
+
+  private val input = new BufferedReader(
+      new InputStreamReader(socket.getInputStream, UTF_8))
 
   override def run(): Unit =
     try read() finally {
@@ -39,7 +42,7 @@ class ServerThread(private val socket: Socket) extends Thread {
   private def read(): Unit = {
     var line = ""
     while ({ line = input.readLine(); line != null }) {
-      output.print(interpret(line))
+      output.write(interpret(line))
       output.flush()
     }
   }
