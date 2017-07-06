@@ -60,6 +60,9 @@ class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
     onto.containsIndividualInSignature(toIRI(s))
 
 
+  def topRole:    Role = df.getOWLTopObjectProperty
+  def bottomRole: Role = df.getOWLBottomObjectProperty
+
   def invert(r: Role): Role = df.getOWLObjectInverseOf(r)
 
   def everything: Concept = df.getOWLThing

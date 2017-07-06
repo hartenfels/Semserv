@@ -118,6 +118,8 @@ object interpret {
 
     def onRole(value: JsValue): Role =
       value match {
+        case JB(true)                => kb.topRole
+        case JB(false)               => kb.bottomRole
         case JA(Seq(JS("r"), JS(s))) => kb.role(s)
         case JA(Seq(JS("i"), v))     => kb.invert(onRole(v))
         case _                       => throw new Exception("bad role")

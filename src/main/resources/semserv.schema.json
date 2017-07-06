@@ -192,6 +192,8 @@
 
     "role" : {
       "anyOf" : [
+        {"title" : "topRole",    "enum" : [true ]},
+        {"title" : "bottomRole", "enum" : [false]},
         {
           "title"    : "role",
           "type"     : "array",
