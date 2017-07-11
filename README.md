@@ -87,12 +87,12 @@ Concept syntax:
 
 Role syntax:
 
-| Role Type   | DL      | JSON          |
-| ----------- |-------- | ------------- |
-| Top Role    | `⊤`     | `true`        |
-| Bottom Role | `⊥`     | `false`       |
-| Role Atom   | `R`     | `["r", R]`    |
-| Inversion   | `R⁻`    | `["i", R]`    |
+| Role Type   | DL   | JSON       |
+| ----------- |----- | ---------- |
+| Top Role    | `⊤`  | `true`     |
+| Bottom Role | `⊥`  | `false`    |
+| Role Atom   | `R`  | `["r", R]` |
+| Inversion   | `R⁻` | `["i", R]` |
 
 ## Request Types
 
