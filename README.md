@@ -76,7 +76,7 @@ Concept syntax:
 | Concept Type               | DL      | JSON          |
 | -------------------------- |-------- | ------------- |
 | Top Concept                | `⊤`     | `true`        |
-| Bottom Concept             | `⊥`     | `true`        |
+| Bottom Concept             | `⊥`     | `false`       |
 | Concept Atom               | `C`     | `["C", C]`    |
 | Nominal Concept            | `{a}`   | `["O", a]`    |
 | Union                      | `C ⊔ D` | `["U", C, D]` |
@@ -87,12 +87,12 @@ Concept syntax:
 
 Role syntax:
 
-| Role Type      | DL      | JSON          |
-| -------------- |-------- | ------------- |
-| Top Concept    | `⊤`     | `true`        |
-| Bottom Concept | `⊥`     | `true`        |
-| Role Atom      | `R`     | `["r", R]`    |
-| Inversion      | `R⁻`    | `["i", R]`    |
+| Role Type   | DL      | JSON          |
+| ----------- |-------- | ------------- |
+| Top Role    | `⊤`     | `true`        |
+| Bottom Role | `⊥`     | `false`       |
+| Role Atom   | `R`     | `["r", R]`    |
+| Inversion   | `R⁻`    | `["i", R]`    |
 
 ## Request Types
 
