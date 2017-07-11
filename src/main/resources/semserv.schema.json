@@ -26,16 +26,6 @@
       "maxItems" : 3,
       "items"    : [
         {"$ref" : "#/_defs/source"},
-        {"enum" : ["comparable"]},
-        {"$ref" : "#/_defs/concepts"}
-      ]
-    },
-    {
-      "type"     : "array",
-      "minItems" : 3,
-      "maxItems" : 3,
-      "items"    : [
-        {"$ref" : "#/_defs/source"},
         {"enum" : ["same"]},
         {"$ref" : "#/_defs/individualsPair"}
       ]

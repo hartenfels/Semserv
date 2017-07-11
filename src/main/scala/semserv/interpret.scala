@@ -76,7 +76,6 @@ object interpret {
       value match {
         case "individual"  => JS(kb.id(onIndividual(args)))
         case "satisfiable" => onSatisfiable(args)
-        case "comparable"  => onComparable(args)
         case "same"        => onSame(args)
         case "query"       => onQuery(args)
         case "project"     => onProject(args)
@@ -97,12 +96,6 @@ object interpret {
 
     def onSatisfiable(value: JsValue): JsValue =
       JB(kb.satisfiable(onConcept(value)))
-
-    def onComparable(value: JsValue): JsValue =
-      value match {
-        case JA(a) => JB(kb.comparable(a.map(onConcept(_)):_*))
-        case _     => throw new Exception("bad comparable")
-      }
 
     def onSame(value: JsValue): JsValue =
       value match {

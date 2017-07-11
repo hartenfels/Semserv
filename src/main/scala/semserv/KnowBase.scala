@@ -95,8 +95,6 @@ class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
 
   def satisfiable(c: Concept): Boolean = hermit.isSatisfiable(c)
 
-  def comparable(cs: Concept*): Boolean = satisfiable(intersect(cs:_*))
-
   def same(i: Individual, j:Individual): Boolean = hermit.isSameIndividual(i, j)
 
 
