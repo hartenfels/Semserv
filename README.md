@@ -6,7 +6,7 @@ Semserv — semantic data server for the [Software Languages Team](http://softla
 # SYNOPSIS
 
 This server is intended for use with
-[Jastics](https://github.com/hartenfels/Jastics).
+[Semantics4J](https://github.com/hartenfels/Semantics4J).
 
 Put your ontology files into [the share directory](share) and just run `make`.
 The server will be built and ran automatically and use the ontology from your
@@ -177,7 +177,7 @@ Wide Web Consortium](https://www.w3.org/).
 
 # SEE ALSO
 
-* [Jastics](https://github.com/hartenfels/Jastics)
+* [Semantics4J](https://github.com/hartenfels/Semantics4J)
 
 * [λ-DL](https://west.uni-koblenz.de/lambda-dl)
 
