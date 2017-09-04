@@ -19,6 +19,7 @@ dependencies {
 mainClassName = 'Main'
 
 jar {
+  archiveName    = 'semserv.jar'
   destinationDir = projectDir
   from {
     configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
