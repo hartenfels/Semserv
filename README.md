@@ -3,6 +3,11 @@
 Semserv — semantic data server for the [Software Languages Team](http://softlang.wikidot.com/) and [Institute for Web Science](https://west.uni-koblenz.de/lambda-dl) of the [University of Koblenz-Landau](https://www.uni-koblenz-landau.de/en/university-of-koblenz-landau)
 
 
+# VERSION
+
+Version 1.0.0
+
+
 # SYNOPSIS
 
 This server is intended for use with

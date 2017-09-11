@@ -23,6 +23,8 @@ object Main {
     if (!args.isEmpty) {
       System.err.println(
         s"""
+           |Semserv 1.0.0
+           |
            |I don't take any arguments.
            |
            |Set the SEMSERV_PORT environment variable
