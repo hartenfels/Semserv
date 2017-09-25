@@ -32,6 +32,16 @@ import org.semanticweb.owlapi.model.{
 }
 
 
+class DummyCache() {
+  def get(req: String): Option[String] = None
+  def set(req: String, res: String): String = res
+}
+
+object DummyCache {
+  def apply(): DummyCache = new DummyCache()
+}
+
+
 object interpret {
   private val validator = new SchemaValidator()
   private val schema    = {
@@ -40,7 +50,7 @@ object interpret {
   }
 
 
-  private val cache = RequestCache()
+  private val cache = DummyCache() // RequestCache()
 
   private def respond(req: String): String =
     cache.get(req).getOrElse(
@@ -74,15 +84,17 @@ object interpret {
   private class Interpreter(private val kb: KnowBase) {
     def onOp(value: String, args: JsValue): JsValue =
       value match {
-        case "individual"  => JS(kb.id(onIndividual(args)))
-        case "satisfiable" => onSatisfiable(args)
-        case "same"        => onSame(args)
-        case "query"       => onQuery(args)
-        case "project"     => onProject(args)
-        case "subtype"     => onSubtype(args)
-        case "member"      => onMember(args)
-        case "signature"   => onSignature(args)
-        case _             => throw new Exception("bad op")
+        case "individual"     => JS(kb.id(onIndividual(args)))
+        case "satisfiable"    => onSatisfiable(args)
+        case "same"           => onSame(args)
+        case "query"          => onQuery(args)
+        case "project"        => onProject(args)
+        case "subtype"        => onSubtype(args)
+        case "member"         => onMember(args)
+        case "signature"      => onSignature(args)
+        case "addIndividual!" => onAddIndividual(args)
+        case "addTriple!"     => onAddTriple(args)
+        case _                => throw new Exception("bad op")
       }
 
     def ja(arr: Array[Individual]): JsValue =
@@ -153,6 +165,20 @@ object interpret {
         case JA(Seq(JS("role"),       JS(iri))) => JB(kb.hasRoleInSignature(iri))
         case JA(Seq(JS("individual"), JS(iri))) => JB(kb.hasIndividualInSignature(iri))
         case _                                  => throw new Exception("bad signature")
+      }
+
+    def onAddIndividual(value: JsValue): JsValue =
+      value match {
+        case JA(Seq(i, c)) => JB(kb.addIndividual(onIndividual(i), onConcept(c)))
+        case _             => throw new Exception("bad addIndividual")
+      }
+
+    def onAddTriple(value: JsValue): JsValue =
+      value match {
+        case JA(Seq(i, r, j)) =>
+          JB(kb.addTriple(onIndividual(i), onRole(r), onIndividual(j)))
+        case _ =>
+          throw new Exception("bad addTriple")
       }
   }
 }

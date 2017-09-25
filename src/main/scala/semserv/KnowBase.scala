@@ -23,7 +23,7 @@ import scala.collection.mutable.HashMap
 import scala.util.Try
 
 import org.semanticweb.owlapi.model.{
-  IRI, OWLAxiom, OWLDataFactory, OWLOntology,
+  AddAxiom, IRI, OWLAxiom, OWLDataFactory, OWLOntology, OWLOntologyManager,
   OWLNamedIndividual          => Individual,
   OWLObjectPropertyExpression => Role,
   OWLClassExpression          => Concept
@@ -37,7 +37,7 @@ object KnowBase {
   private val cache = new HashMap[String, KnowBase] {
     override def default(path: String): KnowBase = {
       val onto   = mgr.loadOntologyFromOntologyDocument(new File(path))
-      val kb     = new KnowBase(df, onto)
+      val kb     = new KnowBase(mgr, df, onto)
       this(path) = kb
       kb
     }
@@ -48,12 +48,11 @@ object KnowBase {
 }
 
 
-class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
-  private val hermit = new Reasoner(onto)
-  private val pre    = hermit.getPrefixes
+class KnowBase(mgr:OWLOntologyManager, df: OWLDataFactory, onto: OWLOntology) {
+  private var hermit = new Reasoner(onto)
+  private var pre    = hermit.getPrefixes
 
-  hermit.precomputeInferences()
-
+  // hermit.precomputeInferences()
 
   private def toIRI (s: String): IRI =
     IRI.create(Try(pre.expandAbbreviatedIRI(s)) getOrElse s)
@@ -120,4 +119,18 @@ class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
     entail(
       df.getOWLClassAssertionAxiom(c, i),
       df.getOWLClassAssertionAxiom(df.getOWLObjectComplementOf(c), i))
+
+
+  private def modify(axiom: OWLAxiom): Boolean = {
+    val changes = mgr.applyChange(new AddAxiom(onto, axiom))
+    hermit.flush() // this throws an exception anyway
+    // changes.size > 0
+    true
+  }
+
+  def addIndividual(i: Individual, c: Concept): Boolean =
+    modify(df.getOWLClassAssertionAxiom(c, i))
+
+  def addTriple(i: Individual, r: Role, j: Individual): Boolean =
+    modify(df.getOWLObjectPropertyAssertionAxiom(r, i, j))
 }

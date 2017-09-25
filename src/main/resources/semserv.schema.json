@@ -87,6 +87,26 @@
           ]
         }
       ]
+    },
+    {
+      "type"     : "array",
+      "minItems" : 3,
+      "maxItems" : 3,
+      "items"    : [
+        {"$ref" : "#/_defs/source"},
+        {"enum" : ["addIndividual!"]},
+        {"$ref" : "#/_defs/individualConceptPair"}
+      ]
+    },
+    {
+      "type"     : "array",
+      "minItems" : 3,
+      "maxItems" : 3,
+      "items"    : [
+        {"$ref" : "#/_defs/source"},
+        {"enum" : ["addTriple!"]},
+        {"$ref" : "#/_defs/triple"}
+      ]
     }
   ],
 
@@ -180,20 +200,22 @@
       ]
     },
 
+    "roleLiteral" : {
+      "title"    : "role",
+      "type"     : "array",
+      "minItems" : 2,
+      "maxItems" : 2,
+      "items"    : [
+        {"enum" : ["r"]},
+        {"type" : "string"}
+      ]
+    },
+
     "role" : {
       "anyOf" : [
         {"title" : "topRole",    "enum" : [true ]},
         {"title" : "bottomRole", "enum" : [false]},
-        {
-          "title"    : "role",
-          "type"     : "array",
-          "minItems" : 2,
-          "maxItems" : 2,
-          "items"    : [
-            {"enum" : ["r"]},
-            {"type" : "string"}
-          ]
-        },
+        {"$ref"  : "#/_defs/roleLiteral"},
         {
           "title"    : "invert",
           "type"     : "array",
@@ -241,6 +263,29 @@
       "maxItems" : 2,
       "items"    : [
         {"$ref" : "#/_defs/concept"},
+        {"$ref" : "#/_defs/individual"}
+      ]
+    },
+
+    "individualConceptPair" : {
+      "title"    : "individualConceptPair",
+      "type"     : "array",
+      "minItems" : 2,
+      "maxItems" : 2,
+      "items"    : [
+        {"$ref" : "#/_defs/individual"},
+        {"$ref" : "#/_defs/concept"}
+      ]
+    },
+
+    "triple" : {
+      "title"    : "triple",
+      "type"     : "array",
+      "minItems" : 3,
+      "maxItems" : 3,
+      "items"    : [
+        {"$ref" : "#/_defs/individual"},
+        {"$ref" : "#/_defs/roleLiteral"},
         {"$ref" : "#/_defs/individual"}
       ]
     }
