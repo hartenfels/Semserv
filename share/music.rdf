@@ -1,20 +1,31 @@
 <?xml version="1.0"?>
-<rdf:RDF 
-    xmlns="http://example.org/music#" 
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#">
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#">
+]>
+<rdf:RDF
+    xmlns="http://example.org/music#"
     xml:base ="http://example.org/music#"
-    xmlns:owl="http://www.w3.org/2002/07/owl#" 
-    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
-    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" 
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
 
     <owl:Class rdf:ID="Song"/>
     <owl:Class rdf:ID="RadioStation"/>
-    <owl:Class rdf:ID="MusicArtist"/>
+    <owl:Class rdf:ID="MusicArtist">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#recorded"/>
+                <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
     <owl:Class rdf:ID="RecordedSong">
         <owl:equivalentClass>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="#recorded" />
-                <owl:someValuesFrom rdf:resource="#Song" />
+                <owl:onProperty rdf:resource="#recorded"/>
+                <owl:someValuesFrom rdf:resource="#Song"/>
             </owl:Restriction>
         </owl:equivalentClass>
         <rdfs:subClassOf rdf:resource="#MusicArtist"/>
@@ -34,16 +45,38 @@
         <rdfs:subClassOf rdf:resource="#MusicArtist"/>
     </owl:Class>
 
-    <owl:ObjectProperty rdf:ID="recorded" />
-    <owl:ObjectProperty rdf:ID="playedAt" />
-    <owl:ObjectProperty rdf:ID="influencedBy" />
+    <owl:ObjectProperty rdf:ID="recorded">
+        <rdfs:domain rdf:resource="#MusicArtist"/>
+        <rdfs:range rdf:resource="#Song"/>
+    </owl:ObjectProperty>
 
-    <Song rdf:ID="machineGun"/>
-    <RadioStation rdf:ID="coolFm"/>
+    <owl:ObjectProperty rdf:ID="playedAt"/>
+    <owl:ObjectProperty rdf:ID="influencedBy"/>
+
+    <owl:DatatypeProperty rdf:ID="name">
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:ID="released">
+        <rdfs:domain rdf:resource="#Song"/>
+        <rdfs:range rdf:resource="&xsd;integer"/>
+    </owl:DatatypeProperty>
+
+    <Song rdf:ID="machineGun">
+        <name rdf:datatype="&xsd;string">Machine Gun</name>
+        <released rdf:datatype="&xsd;integer">1969</released>
+        <released rdf:datatype="&xsd;integer">1970</released>
+        <released rdf:datatype="&xsd;integer">1997</released>
+    </Song>
+    <RadioStation rdf:ID="coolFm">
+        <name rdf:datatype="&xsd;string">Cool FM</name>
+    </RadioStation>
     <MusicGroup rdf:ID="beatles">
+        <name rdf:datatype="&xsd;string">The Beatles</name>
         <playedAt rdf:resource="#coolFm"/>
     </MusicGroup>
     <owl:Thing rdf:ID="hendrix">
+        <name rdf:datatype="&xsd;string">Jimmy Hendrix</name>
         <recorded rdf:resource="#machineGun"/>
         <playedAt rdf:resource="#coolFm"/>
         <influencedBy rdf:resource="#beatles"/>
