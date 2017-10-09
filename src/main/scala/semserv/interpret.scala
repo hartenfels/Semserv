@@ -19,6 +19,7 @@ import play.api.libs.json.{
   Json, JsValue, JsSuccess, JsError,
   JsArray   => JA,
   JsBoolean => JB,
+  JsNumber  => JN,
   JsObject  => JO,
   JsString  => JS
 }
@@ -26,9 +27,11 @@ import play.api.libs.json.{
 import com.eclipsesource.schema._
 
 import org.semanticweb.owlapi.model.{
+  OWLLiteral,
   OWLNamedIndividual          => Individual,
   OWLObjectPropertyExpression => Role,
-  OWLClassExpression          => Concept
+  OWLClassExpression          => Concept,
+  OWLDataProperty             => Property
 }
 
 
@@ -79,13 +82,14 @@ object interpret {
         case "same"        => onSame(args)
         case "query"       => onQuery(args)
         case "project"     => onProject(args)
+        case "appropriate" => onAppropriate(args)
         case "subtype"     => onSubtype(args)
         case "member"      => onMember(args)
         case "signature"   => onSignature(args)
         case _             => throw new Exception("bad op")
       }
 
-    def ja(arr: Array[Individual]): JsValue =
+    private def ja(arr: Array[Individual]): JsValue =
       JA(arr.map(i => JS(kb.id(i))).to[Seq])
 
     def onIndividual(value: JsValue): Individual =
@@ -111,6 +115,23 @@ object interpret {
         case JA(Seq(i, r)) => ja(kb.project(onIndividual(i), onRole(r)))
         case _             => throw new Exception("bad project")
       }
+
+
+    private def fromLiteral(l: OWLLiteral): JsValue =
+      if      (l.isBoolean) JA(Seq(JS("b"), JB(l.parseBoolean)))
+      else if (l.isInteger) JA(Seq(JS("i"), JN(l.parseInteger)))
+      else if (l.isFloat  ) JA(Seq(JS("f"), JN(l.parseFloat  )))
+      else if (l.isDouble ) JA(Seq(JS("d"), JN(l.parseDouble )))
+      else                  JA(Seq(JS("s"), JS(l.getLiteral  )))
+
+    def onAppropriate(value: JsValue): JsValue =
+      value match {
+        case JA(Seq(i, p)) =>
+          JA(kb.appropriate(onIndividual(i), onProperty(p)).map(fromLiteral))
+        case _ =>
+          throw new Exception("bad appropriate")
+      }
+
 
     def onSubtype(value: JsValue): JsValue =
       value match {
@@ -147,11 +168,18 @@ object interpret {
         case _                       => throw new Exception("bad concept")
       }
 
+    def onProperty(value: JsValue): Property =
+      value match {
+        case JS(s) => kb.property(s)
+        case _     => throw new Exception("bad property")
+      }
+
     def onSignature(value: JsValue): JsValue =
       value match {
         case JA(Seq(JS("concept"),    JS(iri))) => JB(kb.hasConceptInSignature(iri))
         case JA(Seq(JS("role"),       JS(iri))) => JB(kb.hasRoleInSignature(iri))
         case JA(Seq(JS("individual"), JS(iri))) => JB(kb.hasIndividualInSignature(iri))
+        case JA(Seq(JS("property"),   JS(iri))) => JB(kb.hasPropertyInSignature(iri))
         case _                                  => throw new Exception("bad signature")
       }
   }

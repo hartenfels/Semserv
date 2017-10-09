@@ -23,10 +23,11 @@ import scala.collection.mutable.HashMap
 import scala.util.Try
 
 import org.semanticweb.owlapi.model.{
-  IRI, OWLAxiom, OWLDataFactory, OWLOntology,
+  IRI, OWLAxiom, OWLDataFactory, OWLLiteral, OWLOntology,
   OWLNamedIndividual          => Individual,
   OWLObjectPropertyExpression => Role,
-  OWLClassExpression          => Concept
+  OWLClassExpression          => Concept,
+  OWLDataProperty             => Property
 }
 
 
@@ -61,6 +62,7 @@ class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
   def individual(s: String): Individual = df.getOWLNamedIndividual(toIRI(s))
   def role      (s: String): Role       = df.getOWLObjectProperty(toIRI(s))
   def concept   (s: String): Concept    = df.getOWLClass(toIRI(s))
+  def property  (s: String): Property   = df.getOWLDataProperty(toIRI(s))
 
   def id(i: Individual): String = i.toStringID
 
@@ -73,6 +75,9 @@ class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
 
   def hasIndividualInSignature(s: String): Boolean =
     onto.containsIndividualInSignature(toIRI(s))
+
+  def hasPropertyInSignature(s: String): Boolean =
+    onto.containsDataPropertyInSignature(toIRI(s))
 
 
   def topRole:    Role = df.getOWLTopObjectProperty
@@ -106,6 +111,9 @@ class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
 
   def project(i: Individual, r: Role): Array[Individual] =
     flat(hermit.getObjectPropertyValues(i, r))
+
+  def appropriate(i: Individual, p: Property): Array[OWLLiteral] =
+    hermit.getDataPropertyValues(i, p).toArray(new Array[OWLLiteral](0))
 
 
   private def entail(a: OWLAxiom, b: OWLAxiom): Boolean =

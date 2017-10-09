@@ -56,6 +56,16 @@
       "maxItems" : 3,
       "items"    : [
         {"$ref" : "#/_defs/source"},
+        {"enum" : ["appropriate"]},
+        {"$ref" : "#/_defs/individualPropertyPair"}
+      ]
+    },
+    {
+      "type"     : "array",
+      "minItems" : 3,
+      "maxItems" : 3,
+      "items"    : [
+        {"$ref" : "#/_defs/source"},
         {"enum" : ["subtype"]},
         {"$ref" : "#/_defs/conceptsPair"}
       ]
@@ -82,7 +92,7 @@
           "minItems" : 2,
           "maxItems" : 2,
           "items"    : [
-            {"enum" : ["concept", "role", "individual"]},
+            {"enum" : ["concept", "role", "individual", "property"]},
             {"$ref" : "#/_defs/iri"}
           ]
         }
@@ -207,6 +217,10 @@
       ]
     },
 
+    "property" : {
+      "type" : "string"
+    },
+
     "individualsPair" : {
       "title"    : "individualsPair",
       "type"     : "array",
@@ -231,6 +245,17 @@
       "items"    : [
         {"$ref" : "#/_defs/individual"},
         {"$ref" : "#/_defs/role"}
+      ]
+    },
+
+    "individualPropertyPair" : {
+      "title"    : "individualPropertyPair",
+      "type"     : "array",
+      "minItems" : 2,
+      "maxItems" : 2,
+      "items"    : [
+        {"$ref" : "#/_defs/individual"},
+        {"$ref" : "#/_defs/property"}
       ]
     },
 
