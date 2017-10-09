@@ -1,24 +1,26 @@
-GRADLE ?= gradle
-JAVA   ?= java
+LEIN ?= lein
+JAVA ?= java
 
-
-SOURCE_FILES = $(shell find src -type f)
-BUILD_FILES  = Makefile build.gradle
+SOURCE_FILES = $(wildcard src/semserv/*.clj)
+BUILD_FILES  = Makefile project.clj
 
 
 run: semserv.jar
-	@cd share && $(JAVA) -jar ../$< || echo
+	cd share && $(JAVA) -jar ../semserv.jar
+
+dev:
+	JVM_OPTS="-Duser.dir=$$PWD/share $$JVM_OPTS" $(LEIN) run
 
 semserv.jar: $(SOURCE_FILES) $(BUILD_FILES)
-	$(GRADLE) jar
-	touch $@
+	$(LEIN) uberjar
+	cp target/uberjar/*-standalone.jar $@
 
 
 clean:
-	$(GRADLE) clean
+	$(LEIN) clean
 
 realclean: clean
 	rm -f semserv.jar
 
 
-.PHONY: run clean realclean
+.PHONY: run dev clean realclean

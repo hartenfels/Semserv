@@ -5,7 +5,7 @@ Semserv — semantic data server for the [Software Languages Team](http://softla
 
 # VERSION
 
-Version 1.0.0
+Version 1.1.0-dev **EXPERIMENTAL CLOJURE REWRITE**
 
 
 # SYNOPSIS
@@ -22,17 +22,15 @@ program.
 
 You'll need the following:
 
-* Scala
-
-* Gradle
+* Leiningen
 
 * Java JDK 8, shouldn't matter if it's Oracle or OpenJDK
 
 On a Unix-like system, just run `make` and everything will be compiled for you.
 The server will be ran automatically.
 
-Otherwise, you need to execute `gradle run` manually. To bundle everything into
-a single JAR file, run `gradle jar` and run `java -jar semserv.jar` as if it
+Otherwise, you need to execute `lein run` manually. To bundle everything into
+a single JAR file, run `lein uberjar` and run `java -jar semserv.jar` as if it
 were a regular Java program.
 
 
@@ -160,10 +158,6 @@ same time.
 Caching is kinda dumb, as it is keyed simply by the incoming JSON. Queries that
 are logically the same, but structurally different, will result in different
 cache entries. To fix this, the incoming requests should be normalized first.
-
-The disk cache is never invalidated and must be deleted when the ontologies
-change. The database should probably store the modification time of the
-ontology in each cache entry and invalidate them that way.
 
 
 # LICENSE
