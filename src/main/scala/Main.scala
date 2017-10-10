@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import java.io.File
 import scala.util.Properties.envOrElse
 
 
@@ -35,9 +36,18 @@ object Main {
            |to set the cache database file. This may be
            |a relative or absolute path, or ":memory:"
            |for an in-memory database.
+           |
+           |Set the SEMSERV_DIR environment variable to
+           |specify the base directory to use. Incoming
+           |ontology file paths and the cache path will
+           |be relative to this.
            |""".stripMargin)
       System.exit(2)
     }
+
+    val dir = System.getenv("SEMSERV_DIR")
+    if (dir != null)
+      System.setProperty("user.dir", new File(dir).getCanonicalPath)
 
     semserv.Server(envOrElse("SEMSERV_PORT", s"$DefaultPort").toInt)
   }

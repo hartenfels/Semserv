@@ -9,6 +9,9 @@ BUILD_FILES  = Makefile build.gradle
 run: semserv.jar
 	@cd share && $(JAVA) -jar ../$< || echo
 
+dev:
+	SEMSERV_DIR=share $(GRADLE) run
+
 semserv.jar: $(SOURCE_FILES) $(BUILD_FILES)
 	$(GRADLE) jar
 	touch $@
@@ -21,4 +24,4 @@ realclean: clean
 	rm -f semserv.jar
 
 
-.PHONY: run clean realclean
+.PHONY: run dev clean realclean
