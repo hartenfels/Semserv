@@ -5,7 +5,7 @@ Semserv — semantic data server for the [Software Languages Team](http://softla
 
 # VERSION
 
-Version 1.0.0
+Version 1.1.0-dev
 
 
 # SYNOPSIS

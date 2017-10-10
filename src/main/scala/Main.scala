@@ -24,7 +24,7 @@ object Main {
     if (!args.isEmpty) {
       System.err.println(
         s"""
-           |Semserv 1.0.0
+           |Semserv 1.1.0-dev
            |
            |I don't take any arguments.
            |
