@@ -56,13 +56,6 @@
 
 (defn- id [i] (.toStringID i))
 
-(defn- lit [l]
-  (cond (.isBoolean l) ["b" (.parseBoolean l)]
-        (.isInteger l) ["i" (.parseInteger l)]
-        (.isFloat   l) ["f" (.parseFloat   l)]
-        (.isDouble  l) ["d" (.parseDouble  l)]
-        :else          ["s" (.getLiteral   l)]))
-
 (defmulti ^:private on-op keywordize-first)
 
 (defmethod on-op :individual [_ kb s]
@@ -81,7 +74,7 @@
   (map id (sk/project kb (sk/individual kb i) (on-role kb r))))
 
 (defmethod on-op :appropriate [_ kb [i p]]
-  (map lit (sk/appropriate kb (sk/individual kb i) (sk/property kb p))))
+  (sk/appropriate kb (sk/individual kb i) (sk/property kb p)))
 
 (defmethod on-op :subtype [_ kb [c d]]
   (sk/subtype kb (on-concept kb c) (on-concept kb d)))
@@ -91,6 +84,9 @@
 
 (defmethod on-op :signature [_ kb [kind s]]
   (on-signature kind kb s))
+
+(defmethod on-op :proptype [_ kb p]
+  (sk/property-type kb (sk/property kb p)))
 
 
 (defn- start-op [op kb args]

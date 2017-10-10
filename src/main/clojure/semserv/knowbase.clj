@@ -5,7 +5,8 @@
            [org.semanticweb.owlapi.reasoner InferenceType]
            [org.semanticweb.owlapi.apibinding OWLManager]
            [org.semanticweb.owlapi.model IRI OWLClassExpression OWLIndividual
-                                         OWLObjectPropertyExpression]))
+                                         OWLObjectPropertyExpression]
+           [org.semanticweb.owlapi.search.EntitySearcher]))
 
 
 (def ^:private mgr (OWLManager/createOWLOntologyManager))
@@ -79,9 +80,6 @@
 (defn project [{:keys [hermit]} i r]
   (flat (.getObjectPropertyValues hermit i r)))
 
-(defn appropriate [{:keys [hermit]} i p]
-  (.getDataPropertyValues hermit i p))
-
 
 (defn- entail [{:keys [hermit]} a b]
   (and (.isEntailed hermit a) (not (.isEntailed hermit b))))
@@ -104,3 +102,47 @@
 (defn-sig has-role       ObjectProperty)
 (defn-sig has-concept    Class)
 (defn-sig has-property   DataProperty)
+
+
+(def ^:private java-to-owl
+  {"b" ["boolean"]
+   "d" ["float" "double" "decimal"]
+   "i" ["int" "long" "short" "byte" "integer" "positiveInteger"
+        "negativeInteger" "nonPositiveInteger" "nonNegativeInteger"
+        "unsignedLong" "unsignedShort" "unsignedInt" "unsignedByte"]
+   "s" ["string" "normalizedString"]})
+
+(def ^:private owl-to-java
+  (letfn [(o->j [j os]
+            (map #(vector (str "http://www.w3.org/2001/XMLSchema#" %) j) os))]
+    (into {} (apply concat (map (partial apply o->j) java-to-owl)))))
+
+(def ^:private type-parsers
+  {"b" #(.parseBoolean %)
+   "i" #(.parseInteger %)
+   "f" #(.parseFloat   %)
+   "d" #(.parseDouble  %)})
+
+(defn- naturalize-literal [l]
+  (let [type-key (get owl-to-java (-> l .getDatatype .toStringID))
+        parse-fn (get type-parsers type-key #(.getLiteral %))]
+    [(or type-key "s") (parse-fn l)]))
+
+(defn appropriate [{:keys [hermit] :as kb} i p]
+  (map naturalize-literal (.getDataPropertyValues hermit i p)))
+
+
+(defn- extract-types [axiom]
+  (try (str (.getIRI (.getRange axiom)))
+       (catch Exception _ nil)))
+
+(defn- merge-types [iris]
+  (if (= (-> iris distinct count) 1)
+    (first iris)
+    nil))
+
+(defn property-type [{:keys [onto]} p]
+  (->> (.getDataPropertyRangeAxioms onto p)
+       (map extract-types)
+       (map (partial get owl-to-java))
+       merge-types))
