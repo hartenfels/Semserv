@@ -45,7 +45,7 @@ object KnowBase {
   }
 
   def apply(path: String): KnowBase =
-    cache(new File(path).getAbsolutePath)
+    cache(new File(path).getCanonicalPath)
 }
 
 
