@@ -27,7 +27,7 @@
     {:onto onto :hermit hermit :path path :digest digest}))
 
 (defn get-kb [path]
-  (let [abs-path (-> path io/file .getAbsolutePath)]
+  (let [abs-path (-> path io/file .getCanonicalPath)]
     (if-let [kb (get @kb-cache abs-path)]
       kb
       (-> (swap! kb-cache assoc abs-path (build-kb abs-path)) first second))))
