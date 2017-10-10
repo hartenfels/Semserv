@@ -1,5 +1,6 @@
 (ns semserv.cache
-  (:require [clojure.java.jdbc :as j]))
+  (:require [clojure.data.json :as json]
+            [clojure.java.jdbc :as j]))
 
 
 (def db {:classname   "org.sqlite.JDBC"
@@ -37,7 +38,7 @@
 
 (defn with-cache [op kb args f]
   (swap! conn init-conn)
-  (let [req    (str [(:path kb) op args])
+  (let [req    (json/write-str [(:path kb) op args] :escape-slash false)
         digest (:digest kb)
         cached (uncache req digest)]
     (if (nil? cached)
