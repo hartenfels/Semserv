@@ -15,7 +15,8 @@
  */
 package semserv
 
-import java.io.File
+import java.io.{File, FileInputStream}
+import java.security.{MessageDigest, DigestInputStream}
 import org.semanticweb.HermiT.Reasoner
 import org.semanticweb.owlapi.apibinding.OWLManager
 import org.semanticweb.owlapi.reasoner.NodeSet
@@ -35,10 +36,19 @@ object KnowBase {
   private val mgr = OWLManager.createOWLOntologyManager()
   private val df  = mgr.getOWLDataFactory
 
+  private def digest(file: File) = {
+    val md5 = MessageDigest.getInstance("MD5")
+    val dis = new DigestInputStream(new FileInputStream(file), md5)
+    val buf = new Array[Byte](1024)
+    try { while (dis.read(buf) != -1) {} } finally { dis.close() }
+    md5.digest.map("%02x".format(_)).mkString
+  }
+
   private val cache = new HashMap[String, KnowBase] {
     override def default(path: String): KnowBase = {
-      val onto   = mgr.loadOntologyFromOntologyDocument(new File(path))
-      val kb     = new KnowBase(df, onto)
+      val file   = new File(path)
+      val onto   = mgr.loadOntologyFromOntologyDocument(file)
+      val kb     = new KnowBase(df, onto, path, digest(file))
       this(path) = kb
       kb
     }
@@ -49,7 +59,8 @@ object KnowBase {
 }
 
 
-class KnowBase(df: OWLDataFactory, onto: OWLOntology) {
+class KnowBase(df: OWLDataFactory, onto: OWLOntology,
+               val path: String, val digest: String) {
   private val hermit = new Reasoner(onto)
   private val pre    = hermit.getPrefixes
 

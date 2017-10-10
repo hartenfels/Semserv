@@ -45,33 +45,33 @@ object interpret {
 
   private val cache = RequestCache()
 
+  private def doInterpret(kb: KnowBase, op: String, args: JsValue): String =
+    kb.synchronized {
+      // OWL API isn't thread-safe
+      Json.stringify(new Interpreter(kb).onOp(op, args))
+    }
+
+  private def evaluate(value: JsValue): String =
+    value match {
+      case JA(Seq(JS(kb), JS(op), args)) =>
+        cache.get(KnowBase(kb), op, args, doInterpret)
+      case _ =>
+        throw new Exception("bad root")
+    }
+
   private def respond(req: String): String =
-    cache.get(req).getOrElse(
-      cache.set(req, Json.stringify(interpret.transform(req))))
+    try {
+      val value = Json.parse(req)
+      validator.validate(schema, value) match {
+        case JsSuccess(_, _) => evaluate(value)
+        case JsError(e)      => Json.stringify(JO(Map("error" -> e.toJson)))
+      }
+    } catch {
+      case e: Exception => Json.stringify(JO(Map("error" -> JS(e.toString))))
+    }
 
   def apply(line: String): String =
     if (line.trim.isEmpty()) "" else respond(line) + "\n"
-
-
-  private def transform(source: String): JsValue =
-    try {
-      val value = Json.parse(source)
-      validator.validate(schema, value) match {
-        case JsSuccess(_, _) => execute(value)
-        case JsError(e)      => JO(Map("error" -> e.toJson))
-      }
-    } catch {
-      case e: Exception => JO(Map("error" -> JS(e.toString)))
-    }
-
-  private def execute(value: JsValue): JsValue =
-    value match {
-      case JA(Seq(JS(kb), JS(op), args)) => synchronized {
-        // OWL API isn't thread-safe
-        new Interpreter(KnowBase(kb)).onOp(op, args)
-      }
-      case _ => throw new Exception("bad root")
-    }
 
 
   private class Interpreter(private val kb: KnowBase) {

@@ -161,10 +161,6 @@ Caching is kinda dumb, as it is keyed simply by the incoming JSON. Queries that
 are logically the same, but structurally different, will result in different
 cache entries. To fix this, the incoming requests should be normalized first.
 
-The disk cache is never invalidated and must be deleted when the ontologies
-change. The database should probably store the modification time of the
-ontology in each cache entry and invalidate them that way.
-
 
 # LICENSE
 

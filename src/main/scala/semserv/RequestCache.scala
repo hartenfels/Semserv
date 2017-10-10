@@ -18,6 +18,8 @@ package semserv
 import java.sql.{Connection, DriverManager, PreparedStatement}
 import scala.util.Properties.envOrElse
 
+import play.api.libs.json.{Json, JsValue, JsArray => JA, JsString => JS}
+
 
 object RequestCache {
   def apply(db: Option[String] = None):RequestCache =
@@ -29,26 +31,38 @@ class RequestCache(db: String) {
 
   conn.createStatement().execute("""
       CREATE TABLE IF NOT EXISTS cache (
-        req TEXT PRIMARY KEY NOT NULL,
-        res TEXT NOT NULL
+        req    TEXT PRIMARY KEY NOT NULL,
+        res    TEXT NOT NULL,
+        digest TEXT NOT NULL
       )
     """)
 
 
-  def get(req: String): Option[String] = {
-    val stmt = conn.prepareStatement("SELECT res FROM cache WHERE req = ?")
+  private def uncache(req: String, digest: String): Option[String] = {
+    val stmt = conn.prepareStatement(
+      "SELECT res FROM cache WHERE req = ? AND digest = ?")
     stmt.setString(1, req)
+    stmt.setString(2, digest)
     val rs = stmt.executeQuery()
     if (rs.next()) Some(rs.getString("res")) else None
   }
 
-
-  def set(req: String, res: String): String = {
+  private def cache(req: String, res: String, digest: String): String = {
     val stmt = conn.prepareStatement(
-      "INSERT OR REPLACE INTO cache (req, res) VALUES (?, ?)")
+      "INSERT OR REPLACE INTO cache (req, res, digest) VALUES (?, ?, ?)")
     stmt.setString(1, req)
     stmt.setString(2, res)
+    stmt.setString(3, digest)
     stmt.executeUpdate()
     res
+  }
+
+
+  type EvalFn = (KnowBase, String, JsValue) => String
+
+  def get(kb: KnowBase, op: String, args: JsValue, f: EvalFn): String = {
+    val req    = Json.stringify(JA(Seq(JS(kb.path), JS(op), args)))
+    val digest = kb.digest
+    uncache(req, digest).getOrElse(cache(req, f(kb, op, args), digest))
   }
 }
