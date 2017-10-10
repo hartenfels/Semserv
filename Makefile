@@ -6,7 +6,7 @@ BUILD_FILES  = Makefile project.clj
 
 
 run: semserv.jar
-	SEMSERV_DIR=share $(JAVA) -jar semserv.jar
+	@SEMSERV_DIR=share $(JAVA) -jar $< || echo
 
 dev:
 	SEMSERV_DIR=share $(LEIN) run
