@@ -4,7 +4,7 @@
             [semserv.cache  :as sc]
             [semserv.interpret :refer [interpret]])
   (:import [java.io BufferedReader BufferedWriter InputStreamReader
-                    OutputStreamWriter]
+                    OutputStreamWriter File]
            [java.net ServerSocket]
            [java.nio.charset StandardCharsets]))
 
@@ -51,6 +51,13 @@
       |Set the SEMSERV_CACHE environment variable
       |to set the cache database file. This may be
       |a relative or absolute path, or \":memory:\"
-      |for an in-memory database."))
+      |for an in-memory database.
+      |
+      |Set the SEMSERV_DIR environment variable to
+      |specify the base directory to use. Incoming
+      |ontology file paths and the cache path will
+      |be relative to this."))
     (System/exit 2))
+  (if-let [dir (System/getenv "SEMSERV_DIR")]
+    (System/setProperty "user.dir" (-> dir File. .getCanonicalPath)))
   (listen (Integer/parseInt (or (System/getenv "SEMSERV_PORT") "53115"))))
