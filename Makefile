@@ -7,7 +7,7 @@ BUILD_FILES  = Makefile build.gradle
 
 
 run: semserv.jar
-	@cd share && $(JAVA) -jar ../$< || echo
+	@SEMSERV_DIR=share $(JAVA) -jar $< || echo
 
 dev:
 	SEMSERV_DIR=share $(GRADLE) run
